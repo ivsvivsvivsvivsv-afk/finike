@@ -1,0 +1,54 @@
+{
+  "bot": {
+    "token": "8522444294:AAFAdm3c_5NnnLSVV4-h6R0iutmGJI2Q1bw",
+    "log_level": "INFO"
+  },
+  "images": {
+    "welcome": "images/bot_welcome_banner.png",
+    "catan": "images/bot_catan_visual.png",
+    "carcassonne": "images/bot_carcassonne_visual.png",
+    "dnd": "images/bot_dnd_visual.png",
+    "event_atmosphere": "images/bot_event_atmosphere.png",
+    "confirmation": "images/bot_confirmation_scroll.png"
+  },
+  "event": {
+    "name": "Игровой день в Марина Джим",
+    "location": "Кафе Марина Джим, Финика, Турция",
+    "date": "Суббота",
+    "time_start": "12:00",
+    "time_end": "20:00",
+    "games": [
+      {
+        "id": "catan",
+        "name": "Катан",
+        "emoji": "🏗️",
+        "max_players": 8,
+        "optimal_players": 6,
+        "duration_min": 60,
+        "duration_max": 90
+      },
+      {
+        "id": "carcassonne",
+        "name": "Каркассон",
+        "emoji": "🏰",
+        "max_players": 5,
+        "optimal_players": 4,
+        "duration_min": 30,
+        "duration_max": 45
+      },
+      {
+        "id": "dnd",
+        "name": "D&D",
+        "emoji": "🐉",
+        "max_players": 5,
+        "optimal_players": 4,
+        "duration_min": 120,
+        "duration_max": 180
+      }
+    ]
+  },
+  "storage": {
+    "type": "json",
+    "file": "data/registrations.json"
+  }
+}
