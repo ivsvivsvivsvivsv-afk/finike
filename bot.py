@@ -1,13 +1,16 @@
 """
-🎮 Telegram Bot для Игрового Дня — v3.0 WEBHOOK
+🎮 Telegram Bot для Игрового Дня — v3.1 WEBHOOK
 Регистрация на игры: Катан, Каркассон, D&D
 Работает на Amvera с правильным HTTPS вебхуком
 
-ВЕРСИЯ 3.0:
+ВЕРСИЯ 3.1 - УЛУЧШЕННАЯ:
 ✅ WEBHOOK режим (работает 24/7 на Amvera)
-✅ Отправка заявок администратору (БЕЗ JSON сохранения)
+✅ История сообщений НЕ пропадает
+✅ Описание каждой игры с кнопкой "Подробнее"
+✅ Полные правила игр в отдельных сообщениях
+✅ Кнопки "Назад" и "Записаться" в описании
+✅ Отправка заявок администратору
 ✅ Все картинки загружены
-✅ Просьба подписаться на группу с кнопкой
 ✅ Production Ready
 """
 
@@ -53,11 +56,99 @@ logger = logging.getLogger(__name__)
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-# Данные игр
+# Данные игр с описаниями
 GAMES = {
-    "catan": {"name": "🎲 Катан", "emoji": "🎲"},
-    "carcassonne": {"name": "🏰 Каркассон", "emoji": "🏰"},
-    "dnd": {"name": "🐉 D&D", "emoji": "🐉"}
+    "catan": {
+        "name": "🎲 Катан",
+        "emoji": "🎲",
+        "short": "Стратегическая игра про колонизацию. Собирай ресурсы и строй!"
+    },
+    "carcassonne": {
+        "name": "🏰 Каркассон",
+        "emoji": "🏰",
+        "short": "Тактическая игра про построение средневекового ландшафта. Размещай плитки и получай очки!"
+    },
+    "dnd": {
+        "name": "🐉 D&D",
+        "emoji": "🐉",
+        "short": "Ролевая игра приключений. Создавай персонажа и отправляйся в квест!"
+    }
+}
+
+# Полные описания игр
+GAME_DESCRIPTIONS = {
+    "catan": """
+🎲 КАТАН — ПОЛНЫЕ ПРАВИЛА
+
+Катан — экономическая стратегическая игра для 2-4 игроков.
+
+📋 СУТЬ ИГРЫ:
+Ты колонизатор, который строит поселения, города и дороги на острове Катан. Цель — первым набрать 10 очков победы.
+
+🎯 ЧТО НУЖНО ДЕЛАТЬ:
+1. Размещай поселения (стоит 1 лесоматериал + 1 овца + 1 пшеница + 1 кирпич)
+2. Строй города для большего дохода (стоит 3 руды + 2 пшеницы)
+3. Строй дороги между поселениями (стоит 1 лесоматериал + 1 кирпич)
+4. Каждый ход ты бросаешь кубики — выпавшее число дает ресурсы
+
+📊 РЕСУРСЫ:
+🌲 Лесоматериал, 🌾 Пшеница, 🪨 Руда, 🧱 Кирпич, 🐑 Овцы
+
+⏱️ ВРЕМЯ: 45-60 минут
+👥 ИГРОКИ: 2-4 человека
+🎮 СЛОЖНОСТЬ: Средняя (легко учится, глубокая стратегия)
+
+Первый, кто получит 10 очков — побеждает! 🏆
+""",
+    
+    "carcassonne": """
+🏰 КАРКАССОН — ПОЛНЫЕ ПРАВИЛА
+
+Каркассон — тактическая игра про построение средневекового ландшафта для 2-5 игроков.
+
+📋 СУТЬ ИГРЫ:
+Вы вместе строите огромный пейзаж, добавляя квадратные плитки. Затем размещаете своих фермеров на города, дороги, поля и монастыри, чтобы получить очки.
+
+🎯 ЧТО НУЖНО ДЕЛАТЬ:
+1. Каждый ход ты берешь одну плитку ландшафта
+2. Размещаешь её так, чтобы она подходила к уже построенным
+3. На плитке ты можешь разместить одного из своих фермеров
+4. Когда дорога/город/монастырь/поле завершены — считаются очки
+
+🏘️ ЭЛЕМЕНТЫ НА ПЛИТКАХ:
+🏰 Города, 🛣️ Дороги, ⛪ Монастыри, 🌾 Поля
+
+⏱️ ВРЕМЯ: 30-45 минут
+👥 ИГРОКИ: 2-5 человек
+🎮 СЛОЖНОСТЬ: Легкая (просто правила, интересная тактика)
+
+Самое крутое: все строят вместе, но каждый за себя! Никогда не знаешь, что получится в итоге 😄
+""",
+    
+    "dnd": """
+🐉 D&D (DUNGEONS & DRAGONS) — ПОЛНЫЕ ПРАВИЛА
+
+D&D — кооперативная ролевая игра приключений. Один мастер ведет историю, другие игроки управляют персонажами.
+
+📋 СУТЬ ИГРЫ:
+Ты — герой в фантастическом мире. Мастер описывает ситуацию, ты говоришь, что хочешь сделать, и вместе вы создаете невероятную историю приключений.
+
+🎯 ЧТО НУЖНО ДЕЛАТЬ:
+1. Создаешь персонажа (раса, класс, характер, умения)
+2. Мастер говорит: "Вы в темной подземелье. Впереди слышны звуки..."
+3. Ты решаешь: "Я крадусь вперед и смотрю, что там"
+4. Бросаешь кубик — результат определяет успех/неудачу
+5. История развивается на основе ваших решений
+
+🗺️ ПЕРСОНАЖИ:
+⚔️ Воин, 🏹 Лучник, 🧙 Маг, ⛩️ Священник, 🐱 Плут и многие другие!
+
+⏱️ ВРЕМЯ: 1-4 часа (зависит от приключения)
+👥 ИГРОКИ: 3-6 человек (+ 1 мастер)
+🎮 СЛОЖНОСТЬ: Средняя (много правил, но просто начать)
+
+D&D — это про рассказывание историй, воображение и веселье с друзьями! Никогда не знаешь, что произойдет дальше 🎲✨
+"""
 }
 
 # Временные слоты
@@ -126,42 +217,111 @@ async def cmd_start(message: types.Message):
 
 @dp.callback_query(F.data == "register")
 async def cb_register(query: types.CallbackQuery):
-    """Нажата кнопка 'Зарегистрироваться' — выбор игры"""
+    """Нажата кнопка 'Зарегистрироваться' — показываем описание игр"""
     logger.info(f"📋 Регистрация начата: {query.from_user.username or query.from_user.first_name}")
     
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎲 Катан", callback_data="game_catan")],
-        [InlineKeyboardButton(text="🏰 Каркассон", callback_data="game_carcassonne")],
-        [InlineKeyboardButton(text="🐉 D&D", callback_data="game_dnd")]
-    ])
+    # Создаем описание всех трех игр с кнопками
+    text = """
+🎮 ВЫБЕРИ ИГРУ И УЗНАЙ БОЛЬШЕ
+
+Вот краткое описание каждой игры. Нажми "Подробнее" для полных правил, или сразу "Записаться" чтобы выбрать время!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎲 КАТАН
+{catan_short}
+
+🏰 КАРКАССОН
+{carcassonne_short}
+
+🐉 D&D
+{dnd_short}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+""".format(
+        catan_short=GAMES["catan"]["short"],
+        carcassonne_short=GAMES["carcassonne"]["short"],
+        dnd_short=GAMES["dnd"]["short"]
+    )
     
-    text = "🎮 Выбери игру для регистрации:"
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="📖 Подробнее", callback_data="info_catan"),
+            InlineKeyboardButton(text="✍️ Записаться", callback_data="game_catan")
+        ],
+        [
+            InlineKeyboardButton(text="📖 Подробнее", callback_data="info_carcassonne"),
+            InlineKeyboardButton(text="✍️ Записаться", callback_data="game_carcassonne")
+        ],
+        [
+            InlineKeyboardButton(text="📖 Подробнее", callback_data="info_dnd"),
+            InlineKeyboardButton(text="✍️ Записаться", callback_data="game_dnd")
+        ]
+    ])
     
     try:
         if image_exists(IMAGES["atmosphere"]):
-            await bot.edit_message_media(
+            await bot.send_photo(
                 chat_id=query.message.chat.id,
-                message_id=query.message.message_id,
-                media=types.InputMediaPhoto(
-                    media=types.FSInputFile(IMAGES["atmosphere"])
-                )
-            )
-            await bot.edit_message_caption(
-                chat_id=query.message.chat.id,
-                message_id=query.message.message_id,
+                photo=types.FSInputFile(IMAGES["atmosphere"]),
                 caption=text,
                 reply_markup=keyboard
             )
         else:
-            await query.message.edit_text(text, reply_markup=keyboard)
+            await query.message.answer(text, reply_markup=keyboard)
     except Exception as e:
-        logger.warning(f"⚠️  Ошибка редактирования сообщения: {e}")
+        logger.warning(f"⚠️  Ошибка отправки сообщения: {e}")
         await query.message.answer(text, reply_markup=keyboard)
     
     await query.answer()
 
 
-# Обработчики выбора игры
+# Обработчики для "Подробнее"
+@dp.callback_query(F.data == "info_catan")
+async def cb_info_catan(query: types.CallbackQuery):
+    await handle_game_info(query, "catan")
+
+
+@dp.callback_query(F.data == "info_carcassonne")
+async def cb_info_carcassonne(query: types.CallbackQuery):
+    await handle_game_info(query, "carcassonne")
+
+
+@dp.callback_query(F.data == "info_dnd")
+async def cb_info_dnd(query: types.CallbackQuery):
+    await handle_game_info(query, "dnd")
+
+
+async def handle_game_info(query: types.CallbackQuery, game: str):
+    """Показ полного описания игры"""
+    logger.info(f"📖 Информация о игре: {game}")
+    
+    game_info = GAMES[game]
+    description = GAME_DESCRIPTIONS[game]
+    
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="⬅️ Назад", callback_data="register")],
+        [InlineKeyboardButton(text="✍️ Записаться на " + game_info["name"], callback_data=f"game_{game}")]
+    ])
+    
+    try:
+        if image_exists(IMAGES[game]):
+            await bot.send_photo(
+                chat_id=query.message.chat.id,
+                photo=types.FSInputFile(IMAGES[game]),
+                caption=description,
+                reply_markup=keyboard
+            )
+        else:
+            await query.message.answer(description, reply_markup=keyboard)
+    except Exception as e:
+        logger.warning(f"⚠️  Ошибка отправки информации: {e}")
+        await query.message.answer(description, reply_markup=keyboard)
+    
+    await query.answer()
+
+
+# Обработчики выбора игры (прямой выбор)
 @dp.callback_query(F.data == "game_catan")
 async def cb_game_catan(query: types.CallbackQuery):
     await handle_game_selection(query, "catan")
@@ -190,24 +350,9 @@ async def handle_game_selection(query: types.CallbackQuery, game: str):
     text = f"⏰ Выбери время для игры {game_info['name']}:"
     
     try:
-        if image_exists(IMAGES[game]):
-            await bot.edit_message_media(
-                chat_id=query.message.chat.id,
-                message_id=query.message.message_id,
-                media=types.InputMediaPhoto(
-                    media=types.FSInputFile(IMAGES[game])
-                )
-            )
-            await bot.edit_message_caption(
-                chat_id=query.message.chat.id,
-                message_id=query.message.message_id,
-                caption=text,
-                reply_markup=keyboard
-            )
-        else:
-            await query.message.edit_text(text, reply_markup=keyboard)
+        await query.message.answer(text, reply_markup=keyboard)
     except Exception as e:
-        logger.warning(f"⚠️  Ошибка редактирования сообщения: {e}")
+        logger.warning(f"⚠️  Ошибка отправки времени: {e}")
         await query.message.answer(text, reply_markup=keyboard)
     
     await query.answer()
@@ -274,23 +419,16 @@ async def cb_time_selected(query: types.CallbackQuery):
     
     try:
         if image_exists(IMAGES["confirmation"]):
-            await bot.edit_message_media(
+            await bot.send_photo(
                 chat_id=query.message.chat.id,
-                message_id=query.message.message_id,
-                media=types.InputMediaPhoto(
-                    media=types.FSInputFile(IMAGES["confirmation"])
-                )
-            )
-            await bot.edit_message_caption(
-                chat_id=query.message.chat.id,
-                message_id=query.message.message_id,
+                photo=types.FSInputFile(IMAGES["confirmation"]),
                 caption=confirmation_text,
                 reply_markup=keyboard
             )
         else:
-            await query.message.edit_text(confirmation_text, reply_markup=keyboard)
+            await query.message.answer(confirmation_text, reply_markup=keyboard)
     except Exception as e:
-        logger.warning(f"⚠️  Ошибка редактирования сообщения: {e}")
+        logger.warning(f"⚠️  Ошибка отправки подтверждения: {e}")
         await query.message.answer(confirmation_text, reply_markup=keyboard)
     
     await query.answer("✅ Заявка успешно отправлена администратору!")
@@ -348,7 +486,7 @@ async def on_shutdown(app):
 
 async def main():
     """Главная функция — запуск вебсервера"""
-    logger.info("🎮 Telegram Bot для Игрового Дня v3.0")
+    logger.info("🎮 Telegram Bot для Игрового Дня v3.1")
     logger.info("Режим: WEBHOOK (Amvera compatible)")
     
     # Создаём веб-приложение
