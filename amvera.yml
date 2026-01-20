@@ -8,6 +8,4 @@ build:
   useCache: true
 run:
   scriptName: bot.py
-  command: null
-  persistenceMount: /data
-  containerPort: "80"
+  containerPort: "8000" 
