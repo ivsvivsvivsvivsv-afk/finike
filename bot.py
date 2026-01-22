@@ -244,20 +244,20 @@ async def cb_register(query: types.CallbackQuery):
         dnd_short=GAMES["dnd"]["short"]
     )
     
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [
-            InlineKeyboardButton(text="📖 Подробнее", callback_data="info_catan"),
-            InlineKeyboardButton(text="✍️ Записаться", callback_data="game_catan")
-        ],
-        [
-            InlineKeyboardButton(text="📖 Подробнее", callback_data="info_carcassonne"),
-            InlineKeyboardButton(text="✍️ Записаться", callback_data="game_carcassonne")
-        ],
-        [
-            InlineKeyboardButton(text="📖 Подробнее", callback_data="info_dnd"),
-            InlineKeyboardButton(text="✍️ Записаться", callback_data="game_dnd")
-        ]
-    ])
+   keyboard = InlineKeyboardMarkup(inline_keyboard=[
+    [
+        InlineKeyboardButton(text="🎲 Подробнее Катан", callback_data="info_catan"),
+        InlineKeyboardButton(text="📝 Записаться Катан", callback_data="game_catan")
+    ],
+    [
+        InlineKeyboardButton(text="🏰 Подробнее Каркассон", callback_data="info_carcassonne"),
+        InlineKeyboardButton(text="📝 Записаться Каркассон", callback_data="game_carcassonne")
+    ],
+    [
+        InlineKeyboardButton(text="🐉 Подробнее D&D", callback_data="info_dnd"),
+        InlineKeyboardButton(text="📝 Записаться D&D", callback_data="game_dnd")
+    ]
+])
     
     try:
         if image_exists(IMAGES["atmosphere"]):
