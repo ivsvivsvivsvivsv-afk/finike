@@ -1,17 +1,13 @@
 """
-🎮 Telegram Bot для Игрового Дня — v3.1 WEBHOOK
+🎮 Telegram Bot для Игрового Дня — v3.3 WEBHOOK FIX
 Регистрация на игры: Катан, Каркассон, D&D
 Работает на Amvera с правильным HTTPS вебхуком
 
-ВЕРСИЯ 3.1 - УЛУЧШЕННАЯ:
-✅ WEBHOOK режим (работает 24/7 на Amvera)
-✅ История сообщений НЕ пропадает
-✅ Описание каждой игры с кнопкой "Подробнее"
-✅ Полные правила игр в отдельных сообщениях
-✅ Кнопки "Назад" и "Записаться" в описании
-✅ Отправка заявок администратору
-✅ Все картинки загружены
-✅ Production Ready
+ВЕРСИЯ 3.3:
+✅ Исправлена ошибка IndentationError (отступы)
+✅ Кнопки "Подробнее" имеют уникальные эмодзи (🎲, 🏰, 🐉)
+✅ Кнопки "Записаться" имеют общий эмодзи (📝)
+✅ Исправлен ID админа для получения заявок
 """
 
 import logging
@@ -36,7 +32,7 @@ BOT_TOKEN = os.getenv("BOT_TOKEN", "8522444294:AAFAdm3c_5NnnLSVV4-h6R0iutmGJI2Q1
 WEBHOOK_URL = os.getenv("WEBHOOK_URL", "https://finike-zhurkinigor.amvera.io/webhook")
 
 # Параметры бота
-ADMIN_ID = 5906447819  # @secereon
+ADMIN_ID = 190421400  # Обновил на твой ID из логов (secereon)
 GROUP_LINK = "https://t.me/+fgNNmx1VlntiMGUy"
 WEBHOOK_PATH = "/webhook"
 WEBHOOK_HOST = "0.0.0.0"
@@ -244,20 +240,21 @@ async def cb_register(query: types.CallbackQuery):
         dnd_short=GAMES["dnd"]["short"]
     )
     
-   keyboard = InlineKeyboardMarkup(inline_keyboard=[
-    [
-        InlineKeyboardButton(text="🎲 Подробнее Катан", callback_data="info_catan"),
-        InlineKeyboardButton(text="📝 Записаться Катан", callback_data="game_catan")
-    ],
-    [
-        InlineKeyboardButton(text="🏰 Подробнее Каркассон", callback_data="info_carcassonne"),
-        InlineKeyboardButton(text="📝 Записаться Каркассон", callback_data="game_carcassonne")
-    ],
-    [
-        InlineKeyboardButton(text="🐉 Подробнее D&D", callback_data="info_dnd"),
-        InlineKeyboardButton(text="📝 Записаться D&D", callback_data="game_dnd")
-    ]
-])
+    # ИСПРАВЛЕННЫЕ КНОПКИ С РАЗНЫМИ ЭМОДЗИ
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="🎲 Подробнее", callback_data="info_catan"),
+            InlineKeyboardButton(text="📝 Записаться", callback_data="game_catan")
+        ],
+        [
+            InlineKeyboardButton(text="🏰 Подробнее", callback_data="info_carcassonne"),
+            InlineKeyboardButton(text="📝 Записаться", callback_data="game_carcassonne")
+        ],
+        [
+            InlineKeyboardButton(text="🐉 Подробнее", callback_data="info_dnd"),
+            InlineKeyboardButton(text="📝 Записаться", callback_data="game_dnd")
+        ]
+    ])
     
     try:
         if image_exists(IMAGES["atmosphere"]):
@@ -298,10 +295,11 @@ async def handle_game_info(query: types.CallbackQuery, game: str):
     
     game_info = GAMES[game]
     description = GAME_DESCRIPTIONS[game]
+    emoji = game_info["emoji"]
     
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="⬅️ Назад", callback_data="register")],
-        [InlineKeyboardButton(text="✍️ Записаться на " + game_info["name"], callback_data=f"game_{game}")]
+        [InlineKeyboardButton(text=f"{emoji} Записаться на {game_info['name']}", callback_data=f"game_{game}")]
     ])
     
     try:
@@ -486,7 +484,7 @@ async def on_shutdown(app):
 
 async def main():
     """Главная функция — запуск вебсервера"""
-    logger.info("🎮 Telegram Bot для Игрового Дня v3.1")
+    logger.info("🎮 Telegram Bot для Игрового Дня v3.3")
     logger.info("Режим: WEBHOOK (Amvera compatible)")
     
     # Создаём веб-приложение
